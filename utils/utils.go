@@ -17,7 +17,7 @@ func ReturnJsonResponse(res http.ResponseWriter, httpCode int, resMessage []byte
 
 func HandleMessage(success bool, message string) []byte {
 	responseString := fmt.Sprintf(`{
-		"success" : %s,
+		"success" : %t,
 		"message" : %s
 }`, success, message)
 	return []byte(responseString)

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"awesomeProject/controller"
 	"awesomeProject/database"
-	"awesomeProject/handler"
 	"awesomeProject/models"
+	"awesomeProject/repository"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 func main() {
 	log.Print("The is Server Running on localhost port 3000")
 	// initialize the database
-	dbUser, dbPassword, dbName := "mohammad", "", "mohammad"
+	dbUser, dbPassword, dbName := "postgres", "password", "students"
 	db, err := database.ConnectToDB(dbUser, dbPassword, dbName)
 
 	//unable to connect to database
@@ -26,13 +27,17 @@ func main() {
 		return
 	}
 	// route goes here
-
-	http.HandleFunc("/students", handler.GetAllStudents)
-	http.HandleFunc("/student", handler.GetStudentById)
-	http.HandleFunc("/student/add", handler.AddStudent)
-	http.HandleFunc("/student/delete", handler.DeleteStudent)
-	http.HandleFunc("/student/update-student", handler.UpdateStudent)
-	http.HandleFunc("/student/update-student-field", handler.UpdateStudentField)
+	studentController := controller.StudentController{
+		StudentRepository: repository.StudentRepository{
+			DB: db,
+		},
+	}
+	http.HandleFunc("/students", studentController.GetAll)
+	http.HandleFunc("/student", studentController.GetById)
+	http.HandleFunc("/student/add", studentController.Create)
+	http.HandleFunc("/student/delete", studentController.Delete)
+	http.HandleFunc("/student/update", studentController.Put)
+	http.HandleFunc("/student/update-field", studentController.Patch)
 	// listen port
 	err = http.ListenAndServe(":3000", nil)
 	// print any server-based error messages

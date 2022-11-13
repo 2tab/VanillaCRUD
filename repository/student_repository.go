@@ -3,6 +3,7 @@ package repository
 import (
 	"awesomeProject/DTO"
 	"awesomeProject/models"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -45,7 +46,10 @@ func (s StudentRepository) UpdateStudent(student *models.Student) *models.Studen
 }
 
 func (s StudentRepository) UpdateStudentField(patchRequest *DTO.PatchRequest) *models.Student {
-	s.DB.Model(&models.Student{}).Where("id = ?", patchRequest.ID).Update(patchRequest.FIELD, patchRequest.VALUE)
+	err := s.DB.Model(&models.Student{}).Where("id = ?", patchRequest.ID).Update(patchRequest.FIELD, patchRequest.VALUE)
+	if err.Error != nil {
+		fmt.Println(err.Error)
+	}
 	student := &models.Student{}
 	_ = s.DB.First(&student, patchRequest.ID)
 	return student

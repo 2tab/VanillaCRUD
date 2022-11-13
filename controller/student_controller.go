@@ -2,7 +2,6 @@ package controller
 
 import (
 	"awesomeProject/DTO"
-	"awesomeProject/db"
 	"awesomeProject/models"
 	"awesomeProject/repository"
 	"awesomeProject/utils"
@@ -125,7 +124,7 @@ func (s StudentController) Put(res http.ResponseWriter, req *http.Request) {
 }
 
 func (s StudentController) Patch(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "Patch" {
+	if req.Method != "PATCH" {
 		handlerMessage := utils.HandleMessage(false, "No students are registered")
 		utils.ReturnJsonResponse(res, http.StatusNotFound, handlerMessage)
 		return
@@ -143,13 +142,13 @@ func (s StudentController) Patch(res http.ResponseWriter, req *http.Request) {
 	err := json.NewDecoder(data).Decode(&patchRequest)
 
 	if err != nil {
-		handlerMessage := utils.HandleMessage(false, "No students are registered")
+		handlerMessage := utils.HandleMessage(false, "error decoding")
 		utils.ReturnJsonResponse(res, http.StatusNotFound, handlerMessage)
 		return
 	}
 	if student := s.StudentRepository.UpdateStudentField(&patchRequest); student == nil {
 
-		handlerMessage := utils.HandleMessage(false, "No students are registered")
+		handlerMessage := utils.HandleMessage(false, "can't patch")
 		utils.ReturnJsonResponse(res, http.StatusNotFound, handlerMessage)
 	}
 	handlerMessage := utils.HandleMessage(true, "Student updated")
@@ -163,17 +162,11 @@ func (s StudentController) Delete(res http.ResponseWriter, req *http.Request) {
 	}
 	if _, ok := req.URL.Query()["id"]; !ok {
 
-		handlerMessage := utils.HandleMessage(false, "No students are registered")
+		handlerMessage := utils.HandleMessage(false, "No id avialable")
 		utils.ReturnJsonResponse(res, http.StatusNotFound, handlerMessage)
 		return
 	}
 	id := req.URL.Query()["id"][0]
-	if _, ok := db.StudentDB[id]; !ok {
-
-		handlerMessage := utils.HandleMessage(false, "No students are registered")
-		utils.ReturnJsonResponse(res, http.StatusNotFound, handlerMessage)
-		return
-	}
 	if flag := s.StudentRepository.Delete(id); !flag {
 
 		handlerMessage := utils.HandleMessage(false, "No students are registered")
